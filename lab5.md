@@ -49,21 +49,23 @@
     - Обоснование: Пользователь — это главная сущность системы, от которой зависят другие действия, такие как создание проектов и задач. Для выполнения любой операции пользователь должен быть авторизован.
     - команды->порождённое событие:
         - CreateUser(String login, String password) -> UserCreated(String login, String password)
+        - AuthorizeUser(String login, String password) -> UserAuthorized(String userLogin)
 2. Агрегат "Проект"
-    - Состав: Проект, Список участников (связь с пользователями), Список задач, Запись об изменениях.
+    - Состав: Проект, Список участников (связь с пользователями), Список задач, Запись об изменениях, список статусов.
     - Контекст: Управление проектами, управление историей изменений, создание и редактирование проектов.
-    - Обоснование: Проект — это ключевая единица для организации работы. Все задачи и участники привязаны к конкретным проектам. Проект управляет доступом участников к задачам и отслеживает их прогресс.
+    - Обоснование: Проект — это ключевая единица для организации работы. Все задачи, участники и статусы привязаны к конкретным проектам. Проект управляет доступом участников к задачам и отслеживает их прогресс.
     - команды->порождённое событие:
         - createProject(String name) -> ProjectCreated(String name), UserAddedToProject(User user, Project project)
         - addUserToProject(Project project, User user) -> UserAddedToProject(String userLogin, Project project)
         - addTask(Project project, Task task) -> TaskCreated(Project project, Task task)
+        - createStatus(Project project, String Name, User creator) -> StatusCreated(Project project, String Name, User user)
+        - DeleteStatus(Project project, Status status, User user) - StatusDeleted(Project project, Status status, , User user)
 3. Агрегат "Задача"
-    - Состав: Задача, Исполнитель (связь с пользователем), Статус задачи, Запись об изменениях.
-    - Контекст: Управление задачами, управление историей изменений, назначение исполнителей.
+    - Состав: Задача.
+    - Контекст: Управление задачами, управление историей изменений.
     - Обоснование: Задача — это основной элемент работы в проекте. Задача имеет множество состояний и может изменяться в процессе работы, при этом важно следить за ее статусом и исполнителем
     - команды->порождённое событие:
         - changeTaskName(Task task, String newName, User user) -> TaskNameChanged(Task task, String newName, User user)
         - assignTaskToUser(Task Task, User assignee, User assigner) -> TaskAssignedToUser(Task Task, User assignee, User assigner)
-        - createStatus(String Name, User creator) -> StatusCreated(String Name, User user)
-        - deleteStatus(Status status) -> StatusDeleted(Status status)
-        - addStatusToTask(Task task, Status status, User user) -> TaskStatusSet(Task task, Status status, User user)
+        - clearTaskStatus(Task task, User user) -> TaskStatusCleared(Task task, User user)
+        - setTaskStatus(Task task, Status status, User user) -> TaskStatusSet(Task task, Status status, User user)
